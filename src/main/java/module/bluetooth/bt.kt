@@ -39,13 +39,19 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
     lateinit var bluetoothAdapter: BluetoothAdapter
 
     enum class Status {
-        DISCONNECT, CONNECTING, CONNECTED
+        NOTREADY, //Определяет то что сам блютус модуль не включен на телефоне
+        READY,    //Определяет то что сам блютус модуль включен на телефоне, или что устройство Disconnect
+        CONNECTING,
+        CONNECTED
     }
 
-    var btStatus = MutableStateFlow(Status.DISCONNECT)
+    /**
+     * Статус работы блютус устройства
+     */
+    var btStatus = MutableStateFlow(Status.NOTREADY)
 
-    //Статус блютус модуля, включен или нет, для обновления компоса
-    var btIsReady = MutableStateFlow(false)
+    //Текст ошибок в модуле
+    var error = MutableStateFlow("")
 
     private var stm32device: BluetoothDevice? = null
 
@@ -60,6 +66,10 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
             ContextCompat.getSystemService(context, BluetoothManager::class.java)!!
         }
         bluetoothAdapter = bluetoothManager.adapter
+
+        if (bt.bluetoothAdapter.isEnabled)
+            btStatus.value = Status.READY
+
     }
 
     @SuppressLint("MissingPermission")
@@ -100,7 +110,7 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
         GlobalScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(1000)
-                if (btStatus.value == Status.DISCONNECT) {
+                if (btStatus.value == Status.READY) {
                     if(stm32device == null)
                       getPairedDevices()
                     connect()
@@ -124,7 +134,7 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
             } catch (e: IOException) {
                 mSocket?.close()
                 Timber.e("Не смогли подключиться к устройсву ${e.message}")
-                btStatus.value = Status.DISCONNECT
+                btStatus.value = Status.READY
             }
 
         }
@@ -197,7 +207,7 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
                 } catch (e: IOException) {
                     Timber.e("Ошибка в приемном потоке ${e.message}")
                     mSocket?.close()
-                    btStatus.value = Status.DISCONNECT
+                    btStatus.value = Status.READY
                     break  //При отключении подключения
                 }
             }

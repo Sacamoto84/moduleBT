@@ -1,7 +1,6 @@
 package module.bluetooth
 
 import android.content.Context
-import kotlinx.coroutines.DelicateCoroutinesApi
 
 
 fun btInitialization(context: Context) {
