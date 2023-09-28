@@ -11,7 +11,6 @@ fun btInitialization(context: Context) {
 
     decoder.run()
 
-
 //    //Следим за тем чтобы при дисконекте снова прошла инициализация компос
 //    GlobalScope.launch(Dispatchers.IO) {
 //        bt.btStatus.collect {
