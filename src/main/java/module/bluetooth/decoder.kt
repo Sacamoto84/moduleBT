@@ -7,16 +7,19 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class NetCommandDecoder(
-    private val channelIn: Channel<String>,               //Входной канал от bt и wifi
+/**
+ * Декодировка входных данных из порта, принимает все что приходит,
+ * на выходе выводит готовые данные их пакета в виде строк
+ */
+class NetPacketDecoder(
+    private val channelIn : Channel<String>,               //Входной канал от bt и wifi
+    private val channelOut: Channel<String>,               //Выходной канал, содержит данные пакета, далее на парсер отправляем
 ) {
 
     /**
      * # Добавить команду
      */
     fun addCmd(name: String, cb: (List<String>) -> Unit = { }) = cmdList.add(CliCommand(name, cb))
-
-    private var lastString = ""
 
     private val channelRoute = Channel<String>(1000000)
 
@@ -133,7 +136,7 @@ class NetCommandDecoder(
                 continue
             }
             //Прошли все проверкu
-            channelOutCommand.send(s)
+            channelOut.send(s)
 
         }
 
@@ -141,41 +144,41 @@ class NetCommandDecoder(
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private val channelOutCommand = Channel<String>(1000000) //Готовые команды из пакета
-
-    data class CliCommand(var name: String, var cb: (List<String>) -> Unit)
-
-    //Перевод на сет
-    private val cmdList = mutableListOf<CliCommand>() //Список команд
-
-
-    /**
-     * Получение самой команды и его парсинг
-     */
-    private suspend fun cliDecoder() {
-        while (true) {
-            val s = channelOutCommand.receive()
-            parse(s)
-        }
-    }
-
-    private fun parse(str: String) {
-
-        if (str.isEmpty()) return
-
-        val l = str.split(' ').toMutableList()
-        val name = l.first()
-        l.removeFirst()
-        val arg: List<String> = l.filter { it.isNotEmpty() }
-        try {
-            val command: CliCommand = cmdList.first { it.name == name }
-            command.cb.invoke(arg)
-        } catch (e: Exception) {
-            Timber.e("CLI отсутствует команда $name")
-        }
-
-    }
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    private val channelOutCommand = Channel<String>(1000000) //Готовые команды из пакета
+//
+//    data class CliCommand(var name: String, var cb: (List<String>) -> Unit)
+//
+//    //Перевод на сет
+//    private val cmdList = mutableListOf<CliCommand>() //Список команд
+//
+//
+//    /**
+//     * Получение самой команды и его парсинг
+//     */
+//    private suspend fun cliDecoder() {
+//        while (true) {
+//            val s = channelOutCommand.receive()
+//            parse(s)
+//        }
+//    }
+//
+//    private fun parse(str: String) {
+//
+//        if (str.isEmpty()) return
+//
+//        val l = str.split(' ').toMutableList()
+//        val name = l.first()
+//        l.removeFirst()
+//        val arg: List<String> = l.filter { it.isNotEmpty() }
+//        try {
+//            val command: CliCommand = cmdList.first { it.name == name }
+//            command.cb.invoke(arg)
+//        } catch (e: Exception) {
+//            Timber.e("CLI отсутствует команда $name")
+//        }
+//
+//    }
 
 
 }

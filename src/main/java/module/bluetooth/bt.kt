@@ -7,9 +7,6 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.os.Build
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +45,7 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
     var btStatus = MutableStateFlow(Status.DISCONNECT)
 
     //Статус блютус модуля, включен или нет, для обновления компоса
-    var btIsReady by mutableStateOf(false)
+    var btIsReady = MutableStateFlow(false)
 
     private var stm32device: BluetoothDevice? = null
 
