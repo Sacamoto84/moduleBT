@@ -19,7 +19,7 @@ class NetPacketDecoder(
     /**
      * # Добавить команду
      */
-    fun addCmd(name: String, cb: (List<String>) -> Unit = { }) = cmdList.add(CliCommand(name, cb))
+    //fun addCmd(name: String, cb: (List<String>) -> Unit = { }) = cmdList.add(CliCommand(name, cb))
 
     private val channelRoute = Channel<String>(1000000)
 
@@ -28,7 +28,7 @@ class NetPacketDecoder(
         Timber.i("Запуск декодировщика")
         GlobalScope.launch(Dispatchers.IO) { decodeScope() }
         GlobalScope.launch(Dispatchers.IO) { commandDecoder() }
-        GlobalScope.launch(Dispatchers.IO) { cliDecoder() }
+        //GlobalScope.launch(Dispatchers.IO) { cliDecoder() }
     }
 
 
@@ -137,7 +137,6 @@ class NetPacketDecoder(
             }
             //Прошли все проверкu
             channelOut.send(s)
-
         }
 
     }
