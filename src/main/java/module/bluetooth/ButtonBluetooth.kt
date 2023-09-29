@@ -1,5 +1,11 @@
 package module.bluetooth
 
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
+import timber.log.Timber
+
 //import android.app.Activity
 //import android.bluetooth.BluetoothAdapter
 //import android.content.Intent
@@ -14,6 +20,7 @@ package module.bluetooth
 //import androidx.compose.ui.Modifier
 //import timber.log.Timber
 //
+//
 //@Composable
 //fun ButtonBluetooth() {
 //
@@ -21,12 +28,12 @@ package module.bluetooth
 //        ActivityResultContracts.StartActivityForResult()
 //    ) {
 //
-//        bt.btIsReady = if (it.resultCode == Activity.RESULT_OK) {
-//            Timber.w("bluetoothLauncher Success")
-//            true
+//        bt.btStatus.value = if (it.resultCode == Activity.RESULT_OK) {
+//            Timber.w("Включение блютуза пользователем")
+//            BT.Status.READY
 //        } else {
-//            Timber.w("bluetoothLauncher Failed")
-//            false
+//            Timber.w("Включение блютуза отклонено пользователем")
+//            BT.Status.NOTREADY
 //        }
 //
 //    }
@@ -34,16 +41,22 @@ package module.bluetooth
 //    // This intent will open the enable bluetooth dialog
 //    val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
 //
-//    Box(modifier = Modifier.fillMaxSize(), Alignment.Center)
-//    {
-//        Button(
-//            onClick = {
-//                if (!bt.bluetoothAdapter.isEnabled) {
-//                    // Bluetooth is off, ask user to turn it on
+//    if (bt.btStatus.collectAsState().value == BT.Status.NOTREADY) {
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(text = "На телефоне отключен Bluetooth")
+//
+//            Button(onClick = {
+//                if (!bt.bluetoothAdapter.isEnabled) { //Блютуз выключен и идет запрос пользоваталя на влючение блютуза
 //                    enableBluetoothContract.launch(enableBluetoothIntent)
 //                }
 //            }) {
-//            Text(text = "Включить Bluetooth")
+//                Text(text = "Включить Bluetooth")
+//            }
+//
 //        }
 //    }
 //
