@@ -195,7 +195,11 @@ class BT(val name: String = "Tonometr", private val chIn: Channel<String>, priva
                         var s = ""
                         val startTime = System.currentTimeMillis()
                         while (buf.ready() && s.length < (1024 * 16) && ((System.currentTimeMillis() - startTime) < 300)) {
-                            s += buf.read().toChar()
+                            val ss = buf.read().toChar()
+                            s += ss
+                            if (ss == '\n'){
+                                break
+                            }
                         }
                         if (s.isNotEmpty()) {
                             chIn.send(s)
